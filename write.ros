@@ -1,0 +1,23 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+
+(require :kakko)
+
+(defun read-file (path)
+  (with-open-file (s path :direction :input)
+    (let ((buf (make-string (file-length s))))
+      (read-sequence buf s)
+      (concatenate 'string "(progn " buf ")"))))
+
+(defun main (&rest argv)
+  (let* ((cl (read-file (car argv)))
+         (kakko (kakko:write-kakko cl)))
+    (loop for i from 0
+          for c in (coerce kakko 'list)
+          do (progn
+               (format t "~c" c)
+               (if (= (mod i 80) 79)
+                 (fresh-line))))))

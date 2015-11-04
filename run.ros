@@ -1,0 +1,17 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+
+(require :kakko)
+
+(defun read-file (path)
+  (with-open-file (s path :direction :input)
+    (let ((buf (make-string (file-length s))))
+      (read-sequence buf s)
+      buf)))
+
+(defun main (&rest argv)
+  (let ((kakko (read-file (car argv))))
+    (kakko:eval-kakko kakko)))
